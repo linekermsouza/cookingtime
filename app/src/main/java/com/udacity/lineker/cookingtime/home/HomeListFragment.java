@@ -18,6 +18,7 @@ package com.udacity.lineker.cookingtime.home;
 
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
+import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -27,6 +28,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.udacity.lineker.cookingtime.R;
+import com.udacity.lineker.cookingtime.databinding.FragmentHomeListBinding;
 import com.udacity.lineker.cookingtime.model.Receipt;
 
 import java.util.List;
@@ -37,7 +39,7 @@ import java.util.List;
 public class HomeListFragment extends Fragment {
 
     private ReceiptAdapter receiptAdapter;
-
+    private FragmentHomeListBinding binding;
     // Mandatory empty constructor
     public HomeListFragment() {
     }
@@ -46,18 +48,12 @@ public class HomeListFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_home_list, container, false);
+
         receiptAdapter = new ReceiptAdapter(receiptClickCallback);
+        binding.recyclerview.setAdapter(receiptAdapter);
 
-
-        final View rootView = inflater.inflate(R.layout.fragment_home_list, container, false);
-
-        // Get a reference to the GridView in the fragment_master_list xml layout file
-        RecyclerView recyclerView = (RecyclerView) rootView.findViewById(R.id.recyclerview);
-
-        recyclerView.setAdapter(receiptAdapter);
-
-        // Return the root view
-        return rootView;
+        return binding.getRoot();
     }
 
     @Override

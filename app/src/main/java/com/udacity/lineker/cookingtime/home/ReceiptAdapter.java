@@ -1,5 +1,6 @@
 package com.udacity.lineker.cookingtime.home;
 
+import android.databinding.DataBindingUtil;
 import android.support.annotation.Nullable;
 import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.RecyclerView;
@@ -8,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.udacity.lineker.cookingtime.R;
+import com.udacity.lineker.cookingtime.databinding.FlavorItemBinding;
 import com.udacity.lineker.cookingtime.model.Receipt;
 
 import java.util.List;
@@ -59,16 +61,18 @@ public class ReceiptAdapter extends RecyclerView.Adapter<ReceiptAdapter.ReceiptV
 
     @Override
     public ReceiptViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.flavor_item, parent, false);
-        //view.setBackgroundResource(mBackground);
-        return new ReceiptViewHolder(view);
+        FlavorItemBinding binding = DataBindingUtil
+                .inflate(LayoutInflater.from(parent.getContext()), R.layout.flavor_item,
+                        parent, false);
+
+        binding.setCallback(receiptClickCallback);
+        return new ReceiptViewHolder(binding);
     }
 
     @Override
     public void onBindViewHolder(ReceiptViewHolder holder, int position) {
-        //holder.binding.setProject(projectList.get(position));
-        //holder.binding.executePendingBindings();
+        holder.binding.setReceipt(receiptList.get(position));
+        holder.binding.executePendingBindings();
     }
 
     @Override
@@ -77,9 +81,11 @@ public class ReceiptAdapter extends RecyclerView.Adapter<ReceiptAdapter.ReceiptV
     }
 
     static class ReceiptViewHolder extends RecyclerView.ViewHolder {
+        final FlavorItemBinding binding;
 
-        public ReceiptViewHolder(View view) {
-            super(view);
+        public ReceiptViewHolder(FlavorItemBinding binding) {
+            super(binding.getRoot());
+            this.binding = binding;
         }
     }
 }
