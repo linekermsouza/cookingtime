@@ -5,9 +5,10 @@ import android.support.annotation.Nullable;
 import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.udacity.lineker.cookingtime.R;
 import com.udacity.lineker.cookingtime.databinding.FlavorItemBinding;
 import com.udacity.lineker.cookingtime.model.Receipt;
@@ -72,6 +73,15 @@ public class ReceiptAdapter extends RecyclerView.Adapter<ReceiptAdapter.ReceiptV
     @Override
     public void onBindViewHolder(ReceiptViewHolder holder, int position) {
         holder.binding.setReceipt(receiptList.get(position));
+
+        String path = holder.binding.getReceipt().getImage(); //"https://receitatodahora.com.br/wp-content/uploads/2018/07/bolo-de-chocolate-fofinho-de-liquidificador.jpg";
+        RequestOptions options = new RequestOptions();
+        Glide.with(holder.binding.avatar.getContext())
+                .load(path)
+                .apply(options.fitCenter()
+                .placeholder(R.drawable.noimage)
+                .error(R.drawable.noimage))
+                .into(holder.binding.avatar);
         holder.binding.executePendingBindings();
     }
 

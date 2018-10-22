@@ -1,0 +1,3 @@
+<resources>
+   <integer name="receipt_list_columns">2</integer>
+</resources>

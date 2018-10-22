@@ -20,9 +20,11 @@ import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
+import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.GridLayoutManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,27 +35,52 @@ import com.udacity.lineker.cookingtime.model.Receipt;
 
 import java.util.List;
 
-
-// This fragment displays all of the AndroidMe images in one large list
-// The list appears as a grid of images
 public class HomeListFragment extends Fragment {
+
+    public static final String POSITION_INDEX = "POSITION_INDEX";
+    public static final String TOP_VIEW = "TOP_VIEW";
 
     private ReceiptAdapter receiptAdapter;
     private FragmentHomeListBinding binding;
+
+    private int positionIndex = -1;
+    private int topView;
+
+    private GridLayoutManager mGridLayoutManager;
+
     // Mandatory empty constructor
     public HomeListFragment() {
     }
 
-    // Inflates the GridView of all AndroidMe images
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_home_list, container, false);
 
         receiptAdapter = new ReceiptAdapter(receiptClickCallback);
-        binding.recyclerview.setAdapter(receiptAdapter);
 
+        mGridLayoutManager = new GridLayoutManager(getActivity(), getResources().getInteger(R.integer.receipt_list_columns));
+        binding.recyclerview.setLayoutManager(mGridLayoutManager);
+        binding.recyclerview.setAdapter(receiptAdapter);
+        updateInfoText(R.string.loading_receipts);
+
+        if (savedInstanceState != null) {
+            this.positionIndex = savedInstanceState.getInt(POSITION_INDEX);
+            this.topView = savedInstanceState.getInt(TOP_VIEW);
+        }
         return binding.getRoot();
+    }
+
+    private void updateInfoText(int resourceString) {
+        if (resourceString > 0) {
+            binding.infoText.setText(resourceString);
+            binding.infoText.setVisibility(View.VISIBLE);
+            binding.recyclerview.setVisibility(View.INVISIBLE);
+        } else {
+            binding.infoText.setText("");
+            binding.infoText.setVisibility(View.INVISIBLE);
+            binding.recyclerview.setVisibility(View.VISIBLE);
+        }
     }
 
     @Override
@@ -65,12 +92,29 @@ public class HomeListFragment extends Fragment {
         observeViewModel(viewModel);
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (positionIndex!= -1) {
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    mGridLayoutManager.scrollToPositionWithOffset(positionIndex, topView);
+                    positionIndex = -1;
+                }
+            },200);
+        }
+    }
+
     private void observeViewModel(ReceiptsViewModel viewModel) {
         // Update the list when the data changes
         viewModel.getReceiptListObservable().observe(this, new Observer<List<Receipt>>() {
             @Override
             public void onChanged(@Nullable List<Receipt> receipts) {
-                if (receipts != null) {
+                if (receipts == null) {
+                    updateInfoText(R.string.error_network);
+                } else {
+                    updateInfoText(receipts.size() == 0 ? R.string.empty_list : 0);
                     receiptAdapter.setReceiptList(receipts);
                 }
             }
@@ -83,4 +127,14 @@ public class HomeListFragment extends Fragment {
 
         }
     };
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        View startView = binding.recyclerview.getChildAt(0);
+        int topView = (startView == null) ? 0 : (startView.getTop() - binding.recyclerview.getPaddingTop());
+
+        outState.putInt(POSITION_INDEX, mGridLayoutManager.findFirstVisibleItemPosition());
+        outState.putInt(TOP_VIEW, topView);
+        super.onSaveInstanceState(outState);
+    }
 }

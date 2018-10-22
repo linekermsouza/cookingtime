@@ -9,6 +9,7 @@ import com.udacity.lineker.cookingtime.model.Receipt;
 import java.util.List;
 
 
+import okhttp3.OkHttpClient;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -20,6 +21,7 @@ public class ReceiptRepository {
     private Webservice webservice;
     private static ReceiptRepository instance;
     private LiveData<List<Receipt>> receiptsCache;
+    OkHttpClient okHttpClient = UnsafeOkHttpClient.get();
 
     public static ReceiptRepository getInstance() {
         if (instance == null) {
@@ -31,6 +33,7 @@ public class ReceiptRepository {
     private ReceiptRepository() {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(Webservice.HTTPS_API_URL)
+                .client(okHttpClient)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
@@ -58,6 +61,7 @@ public class ReceiptRepository {
             @Override
             public void onFailure(Call<List<Receipt>> call, Throwable t) {
                 t.printStackTrace();
+                data.setValue(null);
             }
 
             // Error case is left out for brevity.
