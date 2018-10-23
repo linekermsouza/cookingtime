@@ -18,6 +18,7 @@ package com.udacity.lineker.cookingtime.home;
 
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.os.Handler;
@@ -32,6 +33,8 @@ import android.view.ViewGroup;
 import com.udacity.lineker.cookingtime.R;
 import com.udacity.lineker.cookingtime.databinding.FragmentHomeListBinding;
 import com.udacity.lineker.cookingtime.model.Receipt;
+import com.udacity.lineker.cookingtime.ui.DetailActivity;
+import com.udacity.lineker.cookingtime.ui.MainActivity;
 
 import java.util.List;
 
@@ -124,7 +127,12 @@ public class HomeListFragment extends Fragment {
     private final ReceiptClickCallback receiptClickCallback = new ReceiptClickCallback() {
         @Override
         public void onClick(Receipt receipt) {
+            Bundle b = new Bundle();
+            b.putParcelable("receipt", receipt);
 
+            final Intent intent = new Intent(getContext(), MainActivity.class);
+            intent.putExtras(b);
+            startActivity(intent);
         }
     };
 

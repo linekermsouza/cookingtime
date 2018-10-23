@@ -17,19 +17,19 @@ public class Step implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int i) {
-        dest.writeInt(id);
-        dest.writeString(shortDescription);
-        dest.writeString(description);
-        dest.writeString(videoURL);
-        dest.writeString(thumbnailURL);
+        dest.writeInt(getId());
+        dest.writeString(getShortDescription());
+        dest.writeString(getDescription());
+        dest.writeString(getVideoURL());
+        dest.writeString(getThumbnailURL());
     }
 
     private Step(Parcel p){
-        id = p.readInt();
-        shortDescription = p.readString();
-        description = p.readString();
-        videoURL = p.readString();
-        thumbnailURL = p.readString();
+        setId(p.readInt());
+        setShortDescription(p.readString());
+        setDescription(p.readString());
+        setVideoURL(p.readString());
+        setThumbnailURL(p.readString());
     }
 
     public static final Parcelable.Creator<Step>
@@ -43,4 +43,45 @@ public class Step implements Parcelable {
             return new Step[size];
         }
     };
+
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getShortDescription() {
+        return shortDescription;
+    }
+
+    public void setShortDescription(String shortDescription) {
+        this.shortDescription = shortDescription;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getVideoURL() {
+        return videoURL;
+    }
+
+    public void setVideoURL(String videoURL) {
+        this.videoURL = videoURL;
+    }
+
+    public String getThumbnailURL() {
+        return thumbnailURL;
+    }
+
+    public void setThumbnailURL(String thumbnailURL) {
+        this.thumbnailURL = thumbnailURL;
+    }
 }

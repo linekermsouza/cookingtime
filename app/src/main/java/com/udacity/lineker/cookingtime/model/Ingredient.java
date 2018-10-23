@@ -15,15 +15,15 @@ public class Ingredient implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int i) {
-        dest.writeDouble(quantity);
-        dest.writeString(measure);
-        dest.writeString(ingredient);
+        dest.writeDouble(getQuantity());
+        dest.writeString(getMeasure());
+        dest.writeString(getIngredient());
     }
 
     private Ingredient(Parcel p){
-        quantity = p.readDouble();
-        measure = p.readString();
-        ingredient = p.readString();
+        setQuantity(p.readDouble());
+        setMeasure(p.readString());
+        setIngredient(p.readString());
     }
 
     public static final Parcelable.Creator<Ingredient>
@@ -37,4 +37,29 @@ public class Ingredient implements Parcelable {
             return new Ingredient[size];
         }
     };
+
+
+    public double getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(double quantity) {
+        this.quantity = quantity;
+    }
+
+    public String getMeasure() {
+        return measure;
+    }
+
+    public void setMeasure(String measure) {
+        this.measure = measure;
+    }
+
+    public String getIngredient() {
+        return ingredient;
+    }
+
+    public void setIngredient(String ingredient) {
+        this.ingredient = ingredient;
+    }
 }

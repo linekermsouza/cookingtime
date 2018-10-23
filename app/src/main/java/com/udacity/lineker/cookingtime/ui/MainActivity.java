@@ -1,19 +1,3 @@
-/*
-* Copyright (C) 2017 The Android Open Source Project
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*  	http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
-
 package com.udacity.lineker.cookingtime.ui;
 
 import android.content.Intent;
@@ -28,12 +12,8 @@ import android.widget.Toast;
 import com.udacity.lineker.cookingtime.R;
 import com.udacity.lineker.cookingtime.data.AndroidImageAssets;
 
-// This activity is responsible for displaying the master list of all images
-// Implement the MasterListFragment callback, OnImageClickListener
 public class MainActivity extends AppCompatActivity implements com.udacity.lineker.cookingtime.ui.MasterListFragment.OnImageClickListener{
 
-    // Variables to store the values for the list index of the selected images
-    // The default value will be index = 0
     private int headIndex;
     private int bodyIndex;
     private int legIndex;
@@ -48,23 +28,32 @@ public class MainActivity extends AppCompatActivity implements com.udacity.linek
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        FragmentManager fragmentManager = getSupportFragmentManager();
+
+        // Creating a new head fragment
+        MasterListFragment masterListFragment = new MasterListFragment();
+        Bundle args = new Bundle();
+        args.putParcelable("receipt", getIntent().getExtras().getParcelable("receipt"));
+        masterListFragment.setArguments(args);
+        // Add the fragment to its container using a transaction
+        fragmentManager.beginTransaction()
+                .add(R.id.master_container, masterListFragment)
+                .commit();
+
         // Determine if you're creating a two-pane or single-pane display
         if(findViewById(R.id.detail_layout) != null) {
             // This LinearLayout will only initially exist in the two-pane tablet case
             mTwoPane = true;
 
             // Change the GridView to space out the images more on tablet
-            GridView gridView = (GridView) findViewById(R.id.images_grid_view);
-            gridView.setNumColumns(2);
+            //GridView gridView = (GridView) findViewById(R.id.images_grid_view);
+            //gridView.setNumColumns(2);
 
             // Getting rid of the "Next" button that appears on phones for launching a separate activity
-            Button nextButton = (Button) findViewById(R.id.next_button);
-            nextButton.setVisibility(View.GONE);
+            //Button nextButton = (Button) findViewById(R.id.next_button);
+            //nextButton.setVisibility(View.GONE);
 
             if(savedInstanceState == null) {
-                // In two-pane mode, add initial BodyPartFragments to the screen
-                FragmentManager fragmentManager = getSupportFragmentManager();
-
                 // Creating a new head fragment
                 BodyPartFragment headFragment = new BodyPartFragment();
                 headFragment.setImageIds(AndroidImageAssets.getHeads());
@@ -171,13 +160,13 @@ public class MainActivity extends AppCompatActivity implements com.udacity.linek
             intent.putExtras(b);
 
             // The "Next" button launches a new AndroidMeActivity
-            Button nextButton = (Button) findViewById(R.id.next_button);
-            nextButton.setOnClickListener(new View.OnClickListener() {
+            //Button nextButton = (Button) findViewById(R.id.next_button);
+            /*nextButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     startActivity(intent);
                 }
-            });
+            });*/
         }
 
     }

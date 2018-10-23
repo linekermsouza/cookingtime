@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+    <data>
+        <variable name="item" type="com.udacity.lineker.cookingtime.model.MasterListItem"/>
+        <variable name="callback" type="com.udacity.lineker.cookingtime.ui.ItemClickCallback"/>
+    </data>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        android:layout_margin="8dp"
+        android:onClick="@{() ->  callback.onClick(item)}"
+        android:background="@color/colorPrimary">
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:text="@{item.description}"
+            android:textSize="20sp"
+            android:textColor="@android:color/white"/>
+    </LinearLayout>
+
+</layout>

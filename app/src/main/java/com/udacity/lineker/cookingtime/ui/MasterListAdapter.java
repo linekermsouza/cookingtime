@@ -1,83 +1,95 @@
-/*
-* Copyright (C) 2017 The Android Open Source Project
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*  	http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
-
 package com.udacity.lineker.cookingtime.ui;
 
-import android.content.Context;
-import android.view.View;
+import android.databinding.DataBindingUtil;
+import android.support.annotation.Nullable;
+import android.support.v7.util.DiffUtil;
+import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
-import android.widget.ImageView;
+
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
+import com.udacity.lineker.cookingtime.R;
+import com.udacity.lineker.cookingtime.databinding.MasterListItemBinding;
+import com.udacity.lineker.cookingtime.home.ReceiptClickCallback;
+import com.udacity.lineker.cookingtime.model.MasterListItem;
+import com.udacity.lineker.cookingtime.model.Receipt;
 
 import java.util.List;
 
 
-// Custom adapter class that displays a list of Android-Me images in a GridView
-public class MasterListAdapter extends BaseAdapter {
+public class MasterListAdapter extends RecyclerView.Adapter<MasterListAdapter.MasterListViewHolder> {
 
-    // Keeps track of the context and list of images to display
-    private Context mContext;
-    private List<Integer> mImageIds;
+    List<? extends MasterListItem> masterList;
 
-    /**
-     * Constructor method
-     * @param imageIds The list of images to display
-     */
-    public MasterListAdapter(Context context, List<Integer> imageIds) {
-        mContext = context;
-        mImageIds = imageIds;
+    @Nullable
+    private final ItemClickCallback itemClickCallback;
+
+    public MasterListAdapter(@Nullable ItemClickCallback itemClickCallback) {
+        this.itemClickCallback = itemClickCallback;
     }
 
-    /**
-     * Returns the number of items the adapter will display
-     */
-    @Override
-    public int getCount() {
-        return mImageIds.size();
-    }
-
-    @Override
-    public Object getItem(int i) {
-        return null;
-    }
-
-    @Override
-    public long getItemId(int i) {
-        return 0;
-    }
-
-    /**
-     * Creates a new ImageView for each item referenced by the adapter
-     */
-    public View getView(final int position, View convertView, ViewGroup parent) {
-        ImageView imageView;
-        if (convertView == null) {
-            // If the view is not recycled, this creates a new ImageView to hold an image
-            imageView = new ImageView(mContext);
-            // Define the layout parameters
-            imageView.setAdjustViewBounds(true);
-            imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
-            imageView.setPadding(8, 8, 8, 8);
+    public void setMasterList(final List<? extends MasterListItem> masterList) {
+        if (this.masterList == null) {
+            this.masterList = masterList;
+            notifyItemRangeInserted(0, masterList.size());
         } else {
-            imageView = (ImageView) convertView;
-        }
+            DiffUtil.DiffResult result = DiffUtil.calculateDiff(new DiffUtil.Callback() {
+                @Override
+                public int getOldListSize() {
+                    return MasterListAdapter.this.masterList.size();
+                }
 
-        // Set the image resource and return the newly created ImageView
-        imageView.setImageResource(mImageIds.get(position));
-        return imageView;
+                @Override
+                public int getNewListSize() {
+                    return masterList.size();
+                }
+
+                @Override
+                public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
+                    return MasterListAdapter.this.masterList.get(oldItemPosition).getDescription() ==
+                            masterList.get(newItemPosition).getDescription();
+                }
+
+                @Override
+                public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
+                    MasterListItem item = masterList.get(newItemPosition);
+                    MasterListItem old = masterList.get(oldItemPosition);
+                    return item.getDescription() == old.getDescription();
+                }
+            });
+            this.masterList = masterList;
+            result.dispatchUpdatesTo(this);
+        }
     }
 
+    @Override
+    public MasterListAdapter.MasterListViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        MasterListItemBinding binding = DataBindingUtil
+                .inflate(LayoutInflater.from(parent.getContext()), R.layout.master_list_item,
+                        parent, false);
+
+        binding.setCallback(itemClickCallback);
+        return new MasterListAdapter.MasterListViewHolder(binding);
+    }
+
+    @Override
+    public void onBindViewHolder(MasterListAdapter.MasterListViewHolder holder, int position) {
+        holder.binding.setItem(masterList.get(position));
+        holder.binding.executePendingBindings();
+    }
+
+    @Override
+    public int getItemCount() {
+        return masterList == null ? 0 : masterList.size();
+    }
+
+    static class MasterListViewHolder extends RecyclerView.ViewHolder {
+        final MasterListItemBinding binding;
+
+        public MasterListViewHolder(MasterListItemBinding binding) {
+            super(binding.getRoot());
+            this.binding = binding;
+        }
+    }
 }

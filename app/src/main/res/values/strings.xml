@@ -3,4 +3,5 @@
     <string name="loading_receipts">Carregando receitas</string>
     <string name="empty_list">Lista vazia</string>
     <string name="error_network">Erro ao acessar lista</string>
+    <string name="ingredients_list">Lista de ingredientes</string>
 </resources>
