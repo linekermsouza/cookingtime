@@ -4,4 +4,6 @@
     <string name="empty_list">Lista vazia</string>
     <string name="error_network">Erro ao acessar lista</string>
     <string name="ingredients_list">Lista de ingredientes</string>
+    <string name="previous">Anterior</string>
+    <string name="next">Próximo</string>
 </resources>

@@ -50,9 +50,9 @@ public class ReceiptAdapter extends RecyclerView.Adapter<ReceiptAdapter.ReceiptV
 
                 @Override
                 public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
-                    Receipt project = receiptList.get(newItemPosition);
+                    Receipt receipt = receiptList.get(newItemPosition);
                     Receipt old = receiptList.get(oldItemPosition);
-                    return project.getId() == old.getId();
+                    return receipt.getId() == old.getId();
                 }
             });
             this.receiptList = receiptList;

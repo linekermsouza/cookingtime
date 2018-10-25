@@ -1,4 +1,4 @@
-package com.udacity.lineker.cookingtime.ui;
+package com.udacity.lineker.cookingtime.steps;
 
 import android.databinding.DataBindingUtil;
 import android.support.annotation.Nullable;
@@ -7,13 +7,9 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.RequestOptions;
 import com.udacity.lineker.cookingtime.R;
 import com.udacity.lineker.cookingtime.databinding.MasterListItemBinding;
-import com.udacity.lineker.cookingtime.home.ReceiptClickCallback;
 import com.udacity.lineker.cookingtime.model.MasterListItem;
-import com.udacity.lineker.cookingtime.model.Receipt;
 
 import java.util.List;
 
@@ -23,9 +19,9 @@ public class MasterListAdapter extends RecyclerView.Adapter<MasterListAdapter.Ma
     List<? extends MasterListItem> masterList;
 
     @Nullable
-    private final ItemClickCallback itemClickCallback;
+    private final MasterListFragment.OnStepClickListener itemClickCallback;
 
-    public MasterListAdapter(@Nullable ItemClickCallback itemClickCallback) {
+    public MasterListAdapter(@Nullable MasterListFragment.OnStepClickListener itemClickCallback) {
         this.itemClickCallback = itemClickCallback;
     }
 

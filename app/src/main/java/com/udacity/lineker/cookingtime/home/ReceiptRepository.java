@@ -47,7 +47,6 @@ public class ReceiptRepository {
             return cached;
         }
 
-        // This isn't an optimal implementation. We'll fix it later.
         final MutableLiveData<List<Receipt>> data = new MutableLiveData<>();
         receiptsCache = data;
 

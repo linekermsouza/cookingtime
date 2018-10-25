@@ -1,7 +1,6 @@
-package com.udacity.lineker.cookingtime.ui;
+package com.udacity.lineker.cookingtime.steps;
 
 import android.content.Context;
-import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -9,15 +8,9 @@ import android.support.v7.widget.GridLayoutManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.GridView;
-import android.widget.Toast;
 
 import com.udacity.lineker.cookingtime.R;
-import com.udacity.lineker.cookingtime.data.AndroidImageAssets;
-import com.udacity.lineker.cookingtime.databinding.FragmentHomeListBinding;
 import com.udacity.lineker.cookingtime.databinding.FragmentMasterListBinding;
-import com.udacity.lineker.cookingtime.home.ReceiptClickCallback;
 import com.udacity.lineker.cookingtime.model.Ingredient;
 import com.udacity.lineker.cookingtime.model.MasterListItem;
 import com.udacity.lineker.cookingtime.model.Receipt;
@@ -29,16 +22,16 @@ import java.util.List;
 
 public class MasterListFragment extends Fragment {
 
+    public static final String ARG_RECEIPT = "ARG_RECEIPT";
+
     private FragmentMasterListBinding binding;
     private MasterListAdapter mAdapter;
     private Receipt receipt;
 
-    // Define a new interface OnImageClickListener that triggers a callback in the host activity
-    OnImageClickListener mCallback;
+    OnStepClickListener mCallback;
 
-    // OnImageClickListener interface, calls a method in the host activity named onImageSelected
-    public interface OnImageClickListener {
-        void onImageSelected(int position);
+    public interface OnStepClickListener {
+        void onStepSelected(MasterListItem item);
     }
 
     // Override onAttach to make sure that the container activity has implemented the callback
@@ -49,10 +42,10 @@ public class MasterListFragment extends Fragment {
         // This makes sure that the host activity has implemented the callback interface
         // If not, it throws an exception
         try {
-            mCallback = (OnImageClickListener) context;
+            mCallback = (OnStepClickListener) context;
         } catch (ClassCastException e) {
             throw new ClassCastException(context.toString()
-                    + " must implement OnImageClickListener");
+                    + " must implement OnStepClickListener");
         }
     }
 
@@ -68,14 +61,12 @@ public class MasterListFragment extends Fragment {
 
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_master_list, container, false);
 
-        receipt = getArguments().getParcelable("receipt");
+        receipt = getArguments().getParcelable(ARG_RECEIPT);
         // Create the adapter
-        // This adapter takes in the context and an ArrayList of ALL the image resources to display
-        mAdapter = new MasterListAdapter(itemClickCallback);
+        mAdapter = new MasterListAdapter(mCallback);
 
         GridLayoutManager mGridLayoutManager = new GridLayoutManager(getActivity(), 1);
         binding.recyclerview.setLayoutManager(mGridLayoutManager);
-        // Set the adapter on the GridView
         binding.recyclerview.setAdapter(mAdapter);
         mAdapter.setMasterList(getItems(receipt));
         // Return the root view
@@ -88,26 +79,21 @@ public class MasterListFragment extends Fragment {
 
     }
 
-    private final ItemClickCallback itemClickCallback = new ItemClickCallback() {
-        @Override
-        public void onClick(MasterListItem item) {
-
-        }
-    };
-
     private List<MasterListItem> getItems(Receipt receipt) {
         List<MasterListItem> result = new ArrayList<>();
-        String ingredients = getString(R.string.ingredients_list) + ":\n";
-        for (Ingredient ingredient : receipt.getIngredients()) {
-            ingredients += String.format("- %s (%s %s)\n",
-                    ingredient.getIngredient(), ingredient.getQuantity(), ingredient.getMeasure());
+        if (receipt.getIngredients() != null) {
+            String ingredients = getString(R.string.ingredients_list) + ":\n";
+            for (Ingredient ingredient : receipt.getIngredients()) {
+                ingredients += String.format("- %s (%s %s)\n",
+                        ingredient.getIngredient(), ingredient.getQuantity(), ingredient.getMeasure());
+            }
+            result.add(new MasterListItem(ingredients));
         }
-        result.add(new MasterListItem(ingredients, null));
-
-        for (Step step : receipt.getSteps()) {
+        for (int i = 0; i < receipt.getSteps().size(); i++) {
+            Step step = receipt.getSteps().get(i);
             String description = String.format("%s. %s",
                     step.getId(), step.getShortDescription());
-            result.add(new MasterListItem(description, step));
+            result.add(new MasterListItem(description, receipt, i));
         }
 
         return result;

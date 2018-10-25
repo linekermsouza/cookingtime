@@ -2,16 +2,15 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android">
     <data>
         <variable name="item" type="com.udacity.lineker.cookingtime.model.MasterListItem"/>
-        <variable name="callback" type="com.udacity.lineker.cookingtime.ui.ItemClickCallback"/>
+        <variable name="callback" type="com.udacity.lineker.cookingtime.steps.MasterListFragment.OnStepClickListener"/>
     </data>
-
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="8dp"
         android:layout_margin="8dp"
-        android:onClick="@{() ->  callback.onClick(item)}"
+        android:onClick="@{() ->  callback.onStepSelected(item)}"
         android:background="@color/colorPrimary">
         <TextView
             android:id="@+id/title"

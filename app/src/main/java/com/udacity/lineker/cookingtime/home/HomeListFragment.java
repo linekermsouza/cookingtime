@@ -1,19 +1,3 @@
-/*
-* Copyright (C) 2017 The Android Open Source Project
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*  	http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
-
 package com.udacity.lineker.cookingtime.home;
 
 import android.arch.lifecycle.Observer;
@@ -33,8 +17,7 @@ import android.view.ViewGroup;
 import com.udacity.lineker.cookingtime.R;
 import com.udacity.lineker.cookingtime.databinding.FragmentHomeListBinding;
 import com.udacity.lineker.cookingtime.model.Receipt;
-import com.udacity.lineker.cookingtime.ui.DetailActivity;
-import com.udacity.lineker.cookingtime.ui.MainActivity;
+import com.udacity.lineker.cookingtime.steps.StepsActivity;
 
 import java.util.List;
 
@@ -128,9 +111,9 @@ public class HomeListFragment extends Fragment {
         @Override
         public void onClick(Receipt receipt) {
             Bundle b = new Bundle();
-            b.putParcelable("receipt", receipt);
+            b.putParcelable(StepsActivity.ARG_RECEIPT, receipt);
 
-            final Intent intent = new Intent(getContext(), MainActivity.class);
+            final Intent intent = new Intent(getContext(), StepsActivity.class);
             intent.putExtras(b);
             startActivity(intent);
         }

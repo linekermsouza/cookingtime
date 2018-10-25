@@ -2,11 +2,17 @@ package com.udacity.lineker.cookingtime.model;
 
 public class MasterListItem {
     private String description;
-    private Step step;
+    private int stepPosition;
+    private Receipt receipt;
 
-    public MasterListItem(String description, Step step) {
+    public MasterListItem(String description) {
         this.description = description;
-        this.step = step;
+    }
+
+    public MasterListItem(String description, Receipt receipt, int stepPosition) {
+        this.description = description;
+        this.setReceipt(receipt);
+        this.setStepPosition(stepPosition);
     }
 
     public String getDescription() {
@@ -17,11 +23,20 @@ public class MasterListItem {
         this.description = description;
     }
 
-    public Step getStep() {
-        return step;
+
+    public int getStepPosition() {
+        return stepPosition;
     }
 
-    public void setStep(Step step) {
-        this.step = step;
+    public void setStepPosition(int stepPosition) {
+        this.stepPosition = stepPosition;
+    }
+
+    public Receipt getReceipt() {
+        return receipt;
+    }
+
+    public void setReceipt(Receipt receipt) {
+        this.receipt = receipt;
     }
 }
