@@ -21,7 +21,7 @@ import com.udacity.lineker.cookingtime.steps.StepsActivity;
 
 import java.util.List;
 
-public class HomeListFragment extends Fragment {
+public class HomeListFragment extends Fragment implements View.OnClickListener {
 
     private ReceiptAdapter receiptAdapter;
     private FragmentHomeListBinding binding;
@@ -42,6 +42,7 @@ public class HomeListFragment extends Fragment {
         mGridLayoutManager = new GridLayoutManager(getActivity(), getResources().getInteger(R.integer.receipt_list_columns));
         binding.recyclerview.setLayoutManager(mGridLayoutManager);
         binding.recyclerview.setAdapter(receiptAdapter);
+        binding.update.setOnClickListener(this);
         updateInfoText(R.string.loading_receipts);
 
         return binding.getRoot();
@@ -51,10 +52,13 @@ public class HomeListFragment extends Fragment {
         if (resourceString > 0) {
             binding.infoText.setText(resourceString);
             binding.infoText.setVisibility(View.VISIBLE);
+            binding.update.setVisibility(resourceString == R.string.loading_receipts ?
+                    View.INVISIBLE : View.VISIBLE);
             binding.recyclerview.setVisibility(View.INVISIBLE);
         } else {
             binding.infoText.setText("");
             binding.infoText.setVisibility(View.INVISIBLE);
+            binding.update.setVisibility(View.INVISIBLE);
             binding.recyclerview.setVisibility(View.VISIBLE);
         }
     }
@@ -94,4 +98,16 @@ public class HomeListFragment extends Fragment {
             startActivity(intent);
         }
     };
+
+    @Override
+    public void onClick(View v) {
+        if (v.getId() == R.id.update) {
+            updateInfoText(R.string.loading_receipts);
+            final ReceiptsViewModel viewModel =
+                    ViewModelProviders.of(this).get(ReceiptsViewModel.class);
+
+            viewModel.forceUpdate();
+            observeViewModel(viewModel);
+        }
+    }
 }

@@ -3,6 +3,7 @@ package com.udacity.lineker.cookingtime.steps;
 import android.content.Context;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.view.LayoutInflater;
@@ -15,6 +16,7 @@ import com.udacity.lineker.cookingtime.model.Ingredient;
 import com.udacity.lineker.cookingtime.model.MasterListItem;
 import com.udacity.lineker.cookingtime.model.Receipt;
 import com.udacity.lineker.cookingtime.model.Step;
+import com.udacity.lineker.cookingtime.step.StepActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,15 +25,20 @@ import java.util.List;
 public class MasterListFragment extends Fragment {
 
     public static final String ARG_RECEIPT = "ARG_RECEIPT";
+    public static final String SAVED_STEP_POSITION = "SAVED_STEP_POSITION";
+
+    public static StepActivity.LastInfo lastInfo = new StepActivity.LastInfo();
 
     private FragmentMasterListBinding binding;
     private MasterListAdapter mAdapter;
     private Receipt receipt;
 
     OnStepClickListener mCallback;
+    private boolean mTwoPane;
+    private int currentStepPosition;
 
     public interface OnStepClickListener {
-        void onStepSelected(MasterListItem item);
+        boolean onStepSelected(MasterListItem item);
     }
 
     // Override onAttach to make sure that the container activity has implemented the callback
@@ -59,11 +66,22 @@ public class MasterListFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
+        this.mTwoPane = getResources().getBoolean(R.bool.twoPane);
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_master_list, container, false);
 
         receipt = getArguments().getParcelable(ARG_RECEIPT);
+        this.currentStepPosition = 1;
+        if (savedInstanceState != null) {
+            this.currentStepPosition = savedInstanceState.getInt(SAVED_STEP_POSITION);
+        }
+
+        int currentStepPosition = -1;
+        if (mTwoPane) {
+            currentStepPosition = lastInfo.recoverLastInfo ? lastInfo.stepPosition + 1 : this.currentStepPosition;
+        }
+        lastInfo.recoverLastInfo = false;
         // Create the adapter
-        mAdapter = new MasterListAdapter(mCallback);
+        mAdapter = new MasterListAdapter(mCallback, currentStepPosition);
 
         GridLayoutManager mGridLayoutManager = new GridLayoutManager(getActivity(), 1);
         binding.recyclerview.setLayoutManager(mGridLayoutManager);
@@ -71,12 +89,6 @@ public class MasterListFragment extends Fragment {
         mAdapter.setMasterList(getItems(receipt));
         // Return the root view
         return binding.getRoot();
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-
     }
 
     private List<MasterListItem> getItems(Receipt receipt) {
@@ -97,5 +109,11 @@ public class MasterListFragment extends Fragment {
         }
 
         return result;
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        outState.putInt(SAVED_STEP_POSITION, mTwoPane ? mAdapter.getCurrentStepPosition() : currentStepPosition);
+        super.onSaveInstanceState(outState);
     }
 }

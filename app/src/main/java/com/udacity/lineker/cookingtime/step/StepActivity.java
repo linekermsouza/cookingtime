@@ -10,6 +10,8 @@ import com.udacity.lineker.cookingtime.R;
 import com.udacity.lineker.cookingtime.databinding.ActivityStepBinding;
 import com.udacity.lineker.cookingtime.model.Receipt;
 import com.udacity.lineker.cookingtime.model.Step;
+import com.udacity.lineker.cookingtime.steps.MasterListFragment;
+import com.udacity.lineker.cookingtime.steps.StepsActivity;
 
 public class StepActivity extends AppCompatActivity implements View.OnClickListener {
     public static final String ARG_RECEIPT = "ARG_RECEIPT";
@@ -46,8 +48,9 @@ public class StepActivity extends AppCompatActivity implements View.OnClickListe
             stepPosition = savedInstanceState.getInt(ARG_STEP_POSITION);
         }
         if (twoPane) {
-            LastInfo.stepPosition = stepPosition;
-            LastInfo.recoverLastInfo = true;
+
+            StepsActivity.lastInfo = new LastInfo(stepPosition, true);
+            MasterListFragment.lastInfo = new LastInfo(stepPosition, true);
             finish();
         }
 
@@ -96,8 +99,15 @@ public class StepActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public static class LastInfo {
-        public static int stepPosition;
+        public int stepPosition;
+        public boolean recoverLastInfo;
 
-        public static boolean recoverLastInfo;
+        public LastInfo() {
+
+        }
+        public LastInfo(int stepPosition, boolean recoverLastInfo) {
+            this.stepPosition = stepPosition;
+            this.recoverLastInfo = recoverLastInfo;
+        }
     }
 }

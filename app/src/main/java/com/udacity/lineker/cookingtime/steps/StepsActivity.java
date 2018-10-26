@@ -17,10 +17,13 @@ public class StepsActivity extends AppCompatActivity implements MasterListFragme
     public static final String ARG_RECEIPT = "ARG_RECEIPT";
     public static final String SAVED_DETAIL_CREATED = "SAVED_DETAIL_CREATED";
 
+    public static StepActivity.LastInfo lastInfo = new StepActivity.LastInfo();
+
     // Track whether to display a two-pane or single-pane UI
     // A single-pane display refers to phone screens, and two-pane to larger tablet screens
     private boolean mTwoPane;
     private boolean detailCreated;
+
 
 
     @Override
@@ -54,8 +57,8 @@ public class StepsActivity extends AppCompatActivity implements MasterListFragme
         // Determine if you're creating a two-pane or single-pane display
         if (mTwoPane && !detailCreated) {
             this.detailCreated = true;
-            int lastStepPosition = StepActivity.LastInfo.recoverLastInfo ?
-                    StepActivity.LastInfo.stepPosition : 0;
+            int lastStepPosition = lastInfo.recoverLastInfo ?
+                    lastInfo.stepPosition : 0;
             Step step = receipt.getSteps().get(lastStepPosition);
 
             StepFragment stepFragment = new StepFragment();
@@ -66,10 +69,11 @@ public class StepsActivity extends AppCompatActivity implements MasterListFragme
             fragmentManager.beginTransaction()
                     .add(R.id.detail_container, stepFragment)
                     .commit();
-            StepActivity.LastInfo.recoverLastInfo = false;
+            lastInfo.recoverLastInfo = false;
         }
-        if (mTwoPane && detailCreated && StepActivity.LastInfo.recoverLastInfo) {
-            Step step = receipt.getSteps().get(StepActivity.LastInfo.stepPosition);
+        if (mTwoPane && detailCreated &&
+                lastInfo.recoverLastInfo) {
+            Step step = receipt.getSteps().get(lastInfo.stepPosition);
 
             StepFragment stepFragment = new StepFragment();
             Bundle argsStep = new Bundle();
@@ -79,15 +83,15 @@ public class StepsActivity extends AppCompatActivity implements MasterListFragme
             fragmentManager.beginTransaction()
                     .replace(R.id.detail_container, stepFragment)
                     .commit();
-            StepActivity.LastInfo.recoverLastInfo = false;
+            lastInfo.recoverLastInfo = false;
         }
 
     }
 
     // Define the behavior for onStepSelected
-    public void onStepSelected(MasterListItem item) {
+    public boolean onStepSelected(MasterListItem item) {
         if (item.getReceipt() == null) {
-            return;
+            return false;
         }
 
         if (mTwoPane) {
@@ -114,6 +118,7 @@ public class StepsActivity extends AppCompatActivity implements MasterListFragme
             startActivity(intent);
         }
 
+        return mTwoPane;
     }
 
     @Override

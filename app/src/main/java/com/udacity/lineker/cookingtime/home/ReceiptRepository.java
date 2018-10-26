@@ -68,4 +68,7 @@ public class ReceiptRepository {
         return data;
     }
 
+    public void clearCache() {
+        receiptsCache = null;
+    }
 }

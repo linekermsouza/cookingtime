@@ -17,5 +17,10 @@ public class ReceiptsViewModel extends AndroidViewModel {
     public LiveData<List<Receipt>> getReceiptListObservable() {
         return receiptListObservable;
 }
+
+    public void forceUpdate() {
+        ReceiptRepository.getInstance().clearCache();
+        receiptListObservable = ReceiptRepository.getInstance().getReceipts();
+    }
 }
 

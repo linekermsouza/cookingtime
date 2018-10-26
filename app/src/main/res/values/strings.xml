@@ -6,4 +6,5 @@
     <string name="ingredients_list">Lista de ingredientes</string>
     <string name="previous">Anterior</string>
     <string name="next">Próximo</string>
+    <string name="update">Atualizar</string>
 </resources>

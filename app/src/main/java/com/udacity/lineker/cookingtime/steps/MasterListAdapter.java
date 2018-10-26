@@ -5,6 +5,7 @@ import android.support.annotation.Nullable;
 import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 
 import com.udacity.lineker.cookingtime.R;
@@ -20,9 +21,11 @@ public class MasterListAdapter extends RecyclerView.Adapter<MasterListAdapter.Ma
 
     @Nullable
     private final MasterListFragment.OnStepClickListener itemClickCallback;
+    private int currentStepPosition;
 
-    public MasterListAdapter(@Nullable MasterListFragment.OnStepClickListener itemClickCallback) {
+    public MasterListAdapter(@Nullable MasterListFragment.OnStepClickListener itemClickCallback, int currentStepPosition) {
         this.itemClickCallback = itemClickCallback;
+        this.currentStepPosition = currentStepPosition;
     }
 
     public void setMasterList(final List<? extends MasterListItem> masterList) {
@@ -65,13 +68,23 @@ public class MasterListAdapter extends RecyclerView.Adapter<MasterListAdapter.Ma
                 .inflate(LayoutInflater.from(parent.getContext()), R.layout.master_list_item,
                         parent, false);
 
-        binding.setCallback(itemClickCallback);
         return new MasterListAdapter.MasterListViewHolder(binding);
     }
 
     @Override
-    public void onBindViewHolder(MasterListAdapter.MasterListViewHolder holder, int position) {
+    public void onBindViewHolder(final MasterListAdapter.MasterListViewHolder holder, int position) {
         holder.binding.setItem(masterList.get(position));
+        holder.binding.itemContainer.setBackgroundResource(position == currentStepPosition ?
+            R.color.colorAccent : R.color.colorPrimary);
+        holder.binding.itemContainer.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (itemClickCallback.onStepSelected(holder.binding.getItem())) {
+                    MasterListAdapter.this.currentStepPosition = holder.binding.getItem().getStepPosition() + 1;
+                    notifyDataSetChanged();
+                }
+            }
+        });
         holder.binding.executePendingBindings();
     }
 
@@ -87,5 +100,9 @@ public class MasterListAdapter extends RecyclerView.Adapter<MasterListAdapter.Ma
             super(binding.getRoot());
             this.binding = binding;
         }
+    }
+
+    public int getCurrentStepPosition() {
+        return currentStepPosition;
     }
 }
