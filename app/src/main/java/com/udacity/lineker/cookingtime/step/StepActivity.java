@@ -22,14 +22,14 @@ public class StepActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        boolean twoPane = getResources().getBoolean(R.bool.twoPane);
+
         binding = DataBindingUtil.setContentView(this, R.layout.activity_step);
 
-
+        receipt =  getIntent().getExtras().getParcelable(ARG_RECEIPT);
+        stepPosition = getIntent().getExtras().getInt(ARG_STEP_POSITION);
         // Only create new fragments when there is no previously saved state
         if(savedInstanceState == null) {
-
-            receipt =  getIntent().getExtras().getParcelable(ARG_RECEIPT);
-            stepPosition = getIntent().getExtras().getInt(ARG_STEP_POSITION);
             Step step = receipt.getSteps().get(stepPosition);
 
             StepFragment stepFragment = new StepFragment();
@@ -42,12 +42,18 @@ public class StepActivity extends AppCompatActivity implements View.OnClickListe
             fragmentManager.beginTransaction()
                     .add(R.id.detail_container, stepFragment)
                     .commit();
+        } else {
+            stepPosition = savedInstanceState.getInt(ARG_STEP_POSITION);
+        }
+        if (twoPane) {
+            LastInfo.stepPosition = stepPosition;
+            LastInfo.recoverLastInfo = true;
+            finish();
         }
 
         binding.previous.setOnClickListener(this);
         binding.next.setOnClickListener(this);
         updateNavigationButtons();
-
     }
 
     @Override
@@ -81,5 +87,17 @@ public class StepActivity extends AppCompatActivity implements View.OnClickListe
     private void updateNavigationButtons(){
         binding.previous.setEnabled(stepPosition > 0);
         binding.next.setEnabled(stepPosition < receipt.getSteps().size() - 1);
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putInt(ARG_STEP_POSITION, this.stepPosition);
+        super.onSaveInstanceState(outState);
+    }
+
+    public static class LastInfo {
+        public static int stepPosition;
+
+        public static boolean recoverLastInfo;
     }
 }

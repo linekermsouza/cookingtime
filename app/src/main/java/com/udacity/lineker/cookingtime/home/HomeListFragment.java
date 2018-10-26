@@ -23,14 +23,8 @@ import java.util.List;
 
 public class HomeListFragment extends Fragment {
 
-    public static final String POSITION_INDEX = "POSITION_INDEX";
-    public static final String TOP_VIEW = "TOP_VIEW";
-
     private ReceiptAdapter receiptAdapter;
     private FragmentHomeListBinding binding;
-
-    private int positionIndex = -1;
-    private int topView;
 
     private GridLayoutManager mGridLayoutManager;
 
@@ -50,10 +44,6 @@ public class HomeListFragment extends Fragment {
         binding.recyclerview.setAdapter(receiptAdapter);
         updateInfoText(R.string.loading_receipts);
 
-        if (savedInstanceState != null) {
-            this.positionIndex = savedInstanceState.getInt(POSITION_INDEX);
-            this.topView = savedInstanceState.getInt(TOP_VIEW);
-        }
         return binding.getRoot();
     }
 
@@ -76,20 +66,6 @@ public class HomeListFragment extends Fragment {
                 ViewModelProviders.of(this).get(ReceiptsViewModel.class);
 
         observeViewModel(viewModel);
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        if (positionIndex!= -1) {
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    mGridLayoutManager.scrollToPositionWithOffset(positionIndex, topView);
-                    positionIndex = -1;
-                }
-            },200);
-        }
     }
 
     private void observeViewModel(ReceiptsViewModel viewModel) {
@@ -118,14 +94,4 @@ public class HomeListFragment extends Fragment {
             startActivity(intent);
         }
     };
-
-    @Override
-    public void onSaveInstanceState(@NonNull Bundle outState) {
-        View startView = binding.recyclerview.getChildAt(0);
-        int topView = (startView == null) ? 0 : (startView.getTop() - binding.recyclerview.getPaddingTop());
-
-        outState.putInt(POSITION_INDEX, mGridLayoutManager.findFirstVisibleItemPosition());
-        outState.putInt(TOP_VIEW, topView);
-        super.onSaveInstanceState(outState);
-    }
 }
