@@ -51,6 +51,7 @@ public class StepActivity extends AppCompatActivity implements View.OnClickListe
 
             StepsActivity.lastInfo = new LastInfo(stepPosition, true);
             MasterListFragment.lastInfo = new LastInfo(stepPosition, true);
+            StepFragment.lastInfo.recoverPosition = true;
             finish();
         }
 
