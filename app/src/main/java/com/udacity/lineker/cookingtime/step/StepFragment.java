@@ -4,6 +4,7 @@ import android.databinding.DataBindingUtil;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -36,6 +37,7 @@ public class StepFragment extends Fragment {
     private static final String TAG = "StepFragment";
     private static final String STATE_RESUME_WINDOW = "STATE_RESUME_WINDOW";
     private static final String STATE_RESUME_POSITION = "STATE_RESUME_POSITION";
+    private static final String STATE_FROM_TWO_PANE = "STATE_FROM_TWO_PANE";
 
     private FragmentStepBinding binding;
     private Step step;
@@ -46,23 +48,28 @@ public class StepFragment extends Fragment {
     private boolean videoSet;
 
     public static StepFragment.LastInfo lastInfo = new StepFragment.LastInfo();
+    private boolean mTwoPane;
+    private boolean saveTheSamePosition;
 
     public StepFragment() {
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
+        mTwoPane = getResources().getBoolean(R.bool.twoPane);
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_step, container, false);
 
         step = getArguments().getParcelable(ARG_STEP);
 
         binding.description.setText(step.getDescription());
 
+        boolean fromTwoPane = false;
         if (savedInstanceState != null) {
             mResumeWindow = savedInstanceState.getInt(STATE_RESUME_WINDOW);
             mResumePosition = savedInstanceState.getLong(STATE_RESUME_POSITION);
+            fromTwoPane = savedInstanceState.getBoolean(STATE_FROM_TWO_PANE);
         }
+
         String videoURL = step.getVideoURL();
         if (videoURL.equals("")) {
             videoURL = step.getThumbnailURL();
@@ -75,6 +82,10 @@ public class StepFragment extends Fragment {
         setVideoSize();
         // Return the rootView
 
+        if (fromTwoPane) {
+            releasePlayer();
+            this.saveTheSamePosition = true;
+        }
         return binding.getRoot();
     }
 
@@ -90,7 +101,12 @@ public class StepFragment extends Fragment {
             mExoPlayer = ExoPlayerFactory.newSimpleInstance(this.getContext(), trackSelector, loadControl);
             binding.playerView.setPlayer(mExoPlayer);
             if (lastInfo.recoverPosition) {
-                lastInfo.recoverPosition = false;
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        lastInfo.recoverPosition = false;
+                    }
+                }, 100);
                 mResumePosition = lastInfo.resumePosition;
                 mResumeWindow = lastInfo.resumeWindow;
             }
@@ -156,6 +172,14 @@ public class StepFragment extends Fragment {
             lastInfo.resumePosition = resumePosition;
             lastInfo.resumeWindow = resumeWindow;
         }
+        if (saveTheSamePosition) {
+            outState.putInt(STATE_RESUME_WINDOW, mResumeWindow);
+            outState.putLong(STATE_RESUME_POSITION, mResumePosition);
+            lastInfo.resumePosition = mResumePosition;
+            lastInfo.resumeWindow = mResumeWindow;
+        }
+
+        outState.putBoolean(STATE_FROM_TWO_PANE, mTwoPane);
         super.onSaveInstanceState(outState);
     }
 
