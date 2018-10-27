@@ -1,10 +1,12 @@
 package com.udacity.lineker.cookingtime.step;
 
+import android.content.res.Configuration;
 import android.databinding.DataBindingUtil;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.view.WindowManager;
 
 import com.udacity.lineker.cookingtime.R;
 import com.udacity.lineker.cookingtime.databinding.ActivityStepBinding;
@@ -25,6 +27,7 @@ public class StepActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         boolean twoPane = getResources().getBoolean(R.bool.twoPane);
+        boolean landscape = getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE;
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_step);
 
@@ -53,6 +56,23 @@ public class StepActivity extends AppCompatActivity implements View.OnClickListe
             MasterListFragment.lastInfo = new LastInfo(stepPosition, true);
             StepFragment.lastInfo.recoverPosition = true;
             finish();
+        }
+        if (landscape) {
+            binding.footer.setVisibility(View.GONE);
+            binding.detailContainer.setBackgroundResource(android.R.color.black);
+            getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                    WindowManager.LayoutParams.FLAG_FULLSCREEN);getSupportActionBar().hide();
+            View decorView = getWindow().getDecorView();
+            // Hide both the navigation bar and the status bar.
+            // SYSTEM_UI_FLAG_FULLSCREEN is only available on Android 4.1 and higher, but as
+            // a general rule, you should design your app to hide the status bar whenever you
+            // hide the navigation bar.
+            int uiOptions = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                    | View.SYSTEM_UI_FLAG_FULLSCREEN;
+            decorView.setSystemUiVisibility(uiOptions);
+        } else {
+            binding.detailContainer.setBackgroundResource(android.R.color.white);
+            binding.footer.setVisibility(View.VISIBLE);
         }
 
         binding.previous.setOnClickListener(this);

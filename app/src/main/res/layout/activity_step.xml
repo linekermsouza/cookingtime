@@ -14,8 +14,7 @@
     xmlns:tools="http://schemas.android.com/tools">
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:paddingBottom="8dp">
+        android:layout_height="match_parent">
 
         <FrameLayout
             android:id="@+id/detail_container"
@@ -35,6 +34,7 @@
             android:layout_marginLeft="8dp"
             android:layout_marginRight="8dp"
             android:orientation="horizontal"
+            android:layout_marginBottom="8dp"
             android:gravity="center"
             android:weightSum="1">
 
