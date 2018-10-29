@@ -5,8 +5,6 @@ import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
-import android.os.Handler;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
@@ -14,8 +12,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.udacity.lineker.cookingtime.widget.CookingTimeService;
 import com.udacity.lineker.cookingtime.R;
+import com.udacity.lineker.cookingtime.database.AppDatabase;
+import com.udacity.lineker.cookingtime.database.AppExecutors;
+import com.udacity.lineker.cookingtime.database.IngredientEntry;
+import com.udacity.lineker.cookingtime.database.ReceiptEntry;
 import com.udacity.lineker.cookingtime.databinding.FragmentHomeListBinding;
+import com.udacity.lineker.cookingtime.model.Ingredient;
 import com.udacity.lineker.cookingtime.model.Receipt;
 import com.udacity.lineker.cookingtime.steps.StepsActivity;
 
@@ -27,6 +31,8 @@ public class HomeListFragment extends Fragment implements View.OnClickListener {
     private FragmentHomeListBinding binding;
 
     private GridLayoutManager mGridLayoutManager;
+    private AppDatabase mDb;
+    private ReceiptEntry receiptEntry;
 
     // Mandatory empty constructor
     public HomeListFragment() {
@@ -36,6 +42,8 @@ public class HomeListFragment extends Fragment implements View.OnClickListener {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_home_list, container, false);
+
+        mDb = AppDatabase.getInstance(getContext().getApplicationContext());
 
         receiptAdapter = new ReceiptAdapter(receiptClickCallback);
 
@@ -73,6 +81,16 @@ public class HomeListFragment extends Fragment implements View.OnClickListener {
     }
 
     private void observeViewModel(ReceiptsViewModel viewModel) {
+        viewModel.getReceiptDbObservable(mDb).observe(this, new Observer<List<ReceiptEntry>>() {
+            @Override
+            public void onChanged(@Nullable List<ReceiptEntry> receiptsEntry) {
+                if (receiptsEntry == null || receiptsEntry.size() == 0) {
+                    HomeListFragment.this.receiptEntry = null;
+                } else {
+                    HomeListFragment.this.receiptEntry = receiptsEntry.get(0);
+                }
+            }
+        });
         // Update the list when the data changes
         viewModel.getReceiptListObservable().observe(this, new Observer<List<Receipt>>() {
             @Override
@@ -89,7 +107,30 @@ public class HomeListFragment extends Fragment implements View.OnClickListener {
 
     private final ReceiptClickCallback receiptClickCallback = new ReceiptClickCallback() {
         @Override
-        public void onClick(Receipt receipt) {
+        public void onClick(final Receipt receipt) {
+            AppExecutors.getInstance().diskIO().execute(new Runnable() {
+                @Override
+                public void run() {
+                    if (HomeListFragment.this.receiptEntry != null) {
+                       mDb.receiptDao().delete(HomeListFragment.this.receiptEntry);
+                    }
+                    List<IngredientEntry> entries =  mDb.ingredientDao().loadAllSync();
+                    HomeListFragment.this.receiptEntry = new ReceiptEntry();
+                    HomeListFragment.this.receiptEntry.setId(receipt.getId());
+                    HomeListFragment.this.receiptEntry.setName(receipt.getName());
+                    mDb.receiptDao().insert(HomeListFragment.this.receiptEntry);
+                    for (Ingredient ingredient : receipt.getIngredients()) {
+                        IngredientEntry ingredientEntry = new IngredientEntry();
+                        ingredientEntry.setIngredient(ingredient.getIngredient());
+                        ingredientEntry.setReceiptId(receipt.getId());
+                        ingredientEntry.setMeasure(ingredient.getMeasure());
+                        ingredientEntry.setQuantity(ingredient.getQuantity());
+                        mDb.ingredientDao().insert(ingredientEntry);
+                    }
+                    CookingTimeService.startActionUpdateCookingTimeWidgets(HomeListFragment.this.getContext());
+                }
+            });
+
             Bundle b = new Bundle();
             b.putParcelable(StepsActivity.ARG_RECEIPT, receipt);
 

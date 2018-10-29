@@ -7,4 +7,7 @@
     <string name="previous">Anterior</string>
     <string name="next">Próximo</string>
     <string name="update">Atualizar</string>
+    <string name="appwidget_text">EXAMPLE</string>
+    <string name="add_widget">Add widget</string>
+    <string name="change_receipt">Selecionar receita</string>
 </resources>
