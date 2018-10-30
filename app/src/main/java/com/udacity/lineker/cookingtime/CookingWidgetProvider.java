@@ -56,10 +56,12 @@ public class CookingWidgetProvider extends AppWidgetProvider {
 
     private static ArrayList<String> getItems(List<IngredientEntry> ingredients) {
         ArrayList<String> items = new ArrayList<String>();
-        for (IngredientEntry ingredientEntry : ingredients) {
-            String item = String.format("%s (%s %s)",
-                    ingredientEntry.getIngredient(), ingredientEntry.getQuantity(), ingredientEntry.getMeasure());
-            items.add(item);
+        if (ingredients != null) {
+            for (IngredientEntry ingredientEntry : ingredients) {
+                String item = String.format("%s (%s %s)",
+                        ingredientEntry.getIngredient(), ingredientEntry.getQuantity(), ingredientEntry.getMeasure());
+                items.add(item);
+            }
         }
         return items;
     }
