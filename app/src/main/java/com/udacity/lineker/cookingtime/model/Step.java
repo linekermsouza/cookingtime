@@ -10,6 +10,9 @@ public class Step implements Parcelable {
     private String videoURL;
     private String thumbnailURL;
 
+    public Step() {
+
+    }
     @Override
     public int describeContents() {
         return 0;

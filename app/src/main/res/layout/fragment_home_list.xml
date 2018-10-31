@@ -33,7 +33,7 @@
             android:layout_centerInParent="true"
             android:text="@string/update"
             android:visibility="invisible"
-            android:layout_below="@+id/infoText"/>
+            android:layout_below="@id/infoText"/>
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/recyclerview"

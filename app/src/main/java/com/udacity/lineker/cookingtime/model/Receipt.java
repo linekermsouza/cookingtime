@@ -101,4 +101,5 @@ public class Receipt implements Parcelable {
     public void setImage(String image) {
         this.image = image;
     }
+
 }

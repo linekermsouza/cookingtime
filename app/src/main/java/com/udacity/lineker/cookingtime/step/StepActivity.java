@@ -18,6 +18,7 @@ import com.udacity.lineker.cookingtime.steps.StepsActivity;
 public class StepActivity extends AppCompatActivity implements View.OnClickListener {
     public static final String ARG_RECEIPT = "ARG_RECEIPT";
     public static final String ARG_STEP_POSITION = "ARG_STEP_POSITION";
+    public static final String ARG_INSTRUMENTED_TEST = "ARG_INSTRUMENTED_TEST";
 
     private ActivityStepBinding binding;
     private int stepPosition;
@@ -33,6 +34,11 @@ public class StepActivity extends AppCompatActivity implements View.OnClickListe
 
         receipt =  getIntent().getExtras().getParcelable(ARG_RECEIPT);
         stepPosition = getIntent().getExtras().getInt(ARG_STEP_POSITION);
+        boolean instrumentedTest = getIntent().getExtras().getBoolean(ARG_INSTRUMENTED_TEST, false);
+        if (instrumentedTest) {
+            twoPane = false;
+            landscape = false;
+        }
         // Only create new fragments when there is no previously saved state
         if(savedInstanceState == null) {
             Step step = receipt.getSteps().get(stepPosition);

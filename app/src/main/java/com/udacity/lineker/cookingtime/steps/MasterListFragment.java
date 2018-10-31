@@ -12,11 +12,11 @@ import android.view.ViewGroup;
 
 import com.udacity.lineker.cookingtime.R;
 import com.udacity.lineker.cookingtime.databinding.FragmentMasterListBinding;
-import com.udacity.lineker.cookingtime.model.Ingredient;
 import com.udacity.lineker.cookingtime.model.MasterListItem;
 import com.udacity.lineker.cookingtime.model.Receipt;
 import com.udacity.lineker.cookingtime.model.Step;
 import com.udacity.lineker.cookingtime.step.StepActivity;
+import com.udacity.lineker.cookingtime.util.CookingUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -94,18 +94,12 @@ public class MasterListFragment extends Fragment {
     private List<MasterListItem> getItems(Receipt receipt) {
         List<MasterListItem> result = new ArrayList<>();
         if (receipt.getIngredients() != null) {
-            String ingredients = getString(R.string.ingredients_list) + ":\n";
-            for (Ingredient ingredient : receipt.getIngredients()) {
-                ingredients += String.format("- %s (%s %s)\n",
-                        ingredient.getIngredient(), ingredient.getQuantity(), ingredient.getMeasure());
-            }
-            result.add(new MasterListItem(ingredients));
+
+            result.add(new MasterListItem(CookingUtil.getFormattedIngredients(this.getActivity(), receipt.getIngredients())));
         }
         for (int i = 0; i < receipt.getSteps().size(); i++) {
             Step step = receipt.getSteps().get(i);
-            String description = String.format("%s. %s",
-                    step.getId(), step.getShortDescription());
-            result.add(new MasterListItem(description, receipt, i));
+            result.add(new MasterListItem(CookingUtil.getFormattedStep(step), receipt, i));
         }
 
         return result;

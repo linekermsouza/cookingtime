@@ -8,6 +8,9 @@ public class Ingredient implements Parcelable {
     private String measure;
     private String ingredient;
 
+    public Ingredient() {
+
+    }
     @Override
     public int describeContents() {
         return 0;
